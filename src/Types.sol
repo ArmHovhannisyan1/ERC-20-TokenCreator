@@ -17,10 +17,7 @@ library Types {
         string symbol;
         uint256 initialSupply;
         uint8 tokenDecimals;
-<<<<<<< HEAD
-=======
         address owner;
->>>>>>> 0cb44f4 (Update project)
         bool taxEnabled;
         uint256 taxRate;
         address taxRecipient;
