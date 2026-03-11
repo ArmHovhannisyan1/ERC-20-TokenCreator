@@ -8,21 +8,19 @@ contract HelperConfig is Script {
     /* If we are on a local anvil chain,
     we deploy mocks, otherwise, we grab the
     existing address from the helperconfig */
-    uint256 constant BASE_FEE = 10e6; // 10 USDT
-    uint256 constant MINTABLE_FEE = 5e6; // 5 USDT
-    uint256 constant PAUSABLE_FEE = 3e6;
-    uint256 constant TAX_FEE = 7e6;
-    uint256 constant REVOKE_AUTHORITY_FEE = 2e6;
+    uint256 constant BASE_FEE = 39e6; // 39 USDT
+    uint256 constant REVOKE_MINTING_FEE = 19e6;
+    uint256 constant REVOKE_PAUSING_FEE = 19e6;
+    uint256 constant TAXABLE_FEE = 15e6;
+    uint256 constant CREATOR_INFO_FEE = 19e6;
 
     struct NetworkConfig {
         address usdt;
         uint256 _baseFee;
-        uint256 _mintableFee;
-        uint256 _pausableFee;
-        uint256 _taxFee;
-        uint256 _revokeAuthorityFee;
-        // address feeSystems;
-        // address treasury;
+        uint256 _revokeMintingFee;
+        uint256 _revokePausingFee;
+        uint256 _taxableFee;
+        uint256 _creatorInfoFee;
     }
 
     NetworkConfig public activeNetwork;
@@ -38,10 +36,10 @@ contract HelperConfig is Script {
         NetworkConfig memory sepoliaConfig = NetworkConfig({
             usdt: 0x7169D38820dfd117C3FA1f22a697dBA58d90BA06,
             _baseFee: BASE_FEE,
-            _mintableFee: MINTABLE_FEE,
-            _pausableFee: PAUSABLE_FEE,
-            _taxFee: TAX_FEE,
-            _revokeAuthorityFee: REVOKE_AUTHORITY_FEE
+            _revokeMintingFee: REVOKE_MINTING_FEE,
+            _revokePausingFee: REVOKE_PAUSING_FEE,
+            _taxableFee: TAXABLE_FEE,
+            _creatorInfoFee: CREATOR_INFO_FEE
         });
         return sepoliaConfig;
     }
@@ -50,10 +48,10 @@ contract HelperConfig is Script {
         NetworkConfig memory mainnetConfig = NetworkConfig({
             usdt: 0xdAC17F958D2ee523a2206206994597C13D831ec7,
             _baseFee: BASE_FEE,
-            _mintableFee: MINTABLE_FEE,
-            _pausableFee: PAUSABLE_FEE,
-            _taxFee: TAX_FEE,
-            _revokeAuthorityFee: REVOKE_AUTHORITY_FEE
+            _revokeMintingFee: REVOKE_MINTING_FEE,
+            _revokePausingFee: REVOKE_PAUSING_FEE,
+            _taxableFee: TAXABLE_FEE,
+            _creatorInfoFee: CREATOR_INFO_FEE
         });
         return mainnetConfig;
     }
@@ -68,10 +66,10 @@ contract HelperConfig is Script {
         NetworkConfig memory anvilConfig = NetworkConfig({
             usdt: address(mockUsdt),
             _baseFee: BASE_FEE,
-            _mintableFee: MINTABLE_FEE,
-            _pausableFee: PAUSABLE_FEE,
-            _taxFee: TAX_FEE,
-            _revokeAuthorityFee: REVOKE_AUTHORITY_FEE
+            _revokeMintingFee: REVOKE_MINTING_FEE,
+            _revokePausingFee: REVOKE_PAUSING_FEE,
+            _taxableFee: TAXABLE_FEE,
+            _creatorInfoFee: CREATOR_INFO_FEE
         });
         return anvilConfig;
     }

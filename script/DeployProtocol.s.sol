@@ -9,23 +9,21 @@ import {TokenFactory} from "../src/TokenFactory.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DeployProtocol is Script {
-    IERC20 public usdt;
     function run() external returns (TokenFactory) {
         HelperConfig helperConfig = new HelperConfig();
         HelperConfig.NetworkConfig memory config = helperConfig
             .getActiveConfig();
         vm.startBroadcast();
-        usdt = IERC20(config.usdt);
+        IERC20 usdt = IERC20(config.usdt);
         Treasury treasury = new Treasury(msg.sender);
         FeeSystems feeSystems = new FeeSystems(
             config._baseFee,
-            config._mintableFee,
-            config._pausableFee,
-            config._taxFee,
-            config._revokeAuthorityFee,
+            config._revokeMintingFee,
+            config._revokePausingFee,
+            config._taxableFee,
+            config._creatorInfoFee,
             msg.sender
         );
-
         TokenFactory tokenFactory = new TokenFactory(
             usdt,
             feeSystems,

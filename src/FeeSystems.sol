@@ -5,67 +5,67 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FeeSystems is Ownable {
     uint256 public baseFee;
-    uint256 public mintableFee;
-    uint256 public pausableFee;
-    uint256 public taxFee;
-    uint256 public revokeAuthorityFee;
+    uint256 public revokeMintingFee;
+    uint256 public revokePausingFee;
+    uint256 public taxableFee;
+    uint256 public creatorInfoFee;
 
     event FeesUpdated(
         uint256 baseFee,
-        uint256 mintableFee,
-        uint256 pausableFee,
-        uint256 taxFee,
-        uint256 revokeAuthorityFee
+        uint256 revokeMintingFee,
+        uint256 revokePausingFee,
+        uint256 taxableFee,
+        uint256 creatorInfoFee
     );
 
     constructor(
         uint256 _baseFee,
-        uint256 _mintableFee,
-        uint256 _pausableFee,
-        uint256 _taxFee,
-        uint256 _revokeAuthorityFee,
+        uint256 _revokeMintingFee,
+        uint256 _revokePausingFee,
+        uint256 _taxableFee,
+        uint256 _creatorInfoFee,
         address owner
     ) Ownable(owner) {
         require(owner != address(0), "Owner cannot be zero address");
         baseFee = _baseFee;
-        mintableFee = _mintableFee;
-        pausableFee = _pausableFee;
-        taxFee = _taxFee;
-        revokeAuthorityFee = _revokeAuthorityFee;
+        revokeMintingFee = _revokeMintingFee;
+        revokePausingFee = _revokePausingFee;
+        taxableFee = _taxableFee;
+        creatorInfoFee = _creatorInfoFee;
     }
 
     function calculateFee(
-        bool mintable,
-        bool pausable,
+        bool revokeMinting,
+        bool revokePausing,
         bool taxEnabled,
-        bool revokeAuthority
+        bool hasCreatorInfo
     ) public view returns (uint256 total) {
         total = baseFee;
-
-        if (mintable) total += mintableFee;
-        if (pausable) total += pausableFee;
-        if (taxEnabled) total += taxFee;
-        if (revokeAuthority) total += revokeAuthorityFee;
+        if (revokeMinting) total += revokeMintingFee;
+        if (revokePausing) total += revokePausingFee;
+        if (taxEnabled) total += taxableFee;
+        if(hasCreatorInfo) total += creatorInfoFee;
     }
 
     function setFees(
         uint256 _baseFee,
-        uint256 _mintableFee,
-        uint256 _pausableFee,
-        uint256 _taxFee,
-        uint256 _revokeAuthorityFee
+        uint256 _revokeMintingFee,
+        uint256 _revokePausingFee,
+        uint256 _taxableFee,
+        uint256 _creatorInfoFee
     ) external onlyOwner {
+        require(_baseFee > 0, "Base fee cannot be zero");
         baseFee = _baseFee;
-        mintableFee = _mintableFee;
-        pausableFee = _pausableFee;
-        taxFee = _taxFee;
-        revokeAuthorityFee = _revokeAuthorityFee;
+        revokeMintingFee = _revokeMintingFee;
+        revokePausingFee = _revokePausingFee;
+        taxableFee = _taxableFee;
+        creatorInfoFee = _creatorInfoFee;
         emit FeesUpdated(
             _baseFee,
-            _mintableFee,
-            _pausableFee,
-            _taxFee,
-            _revokeAuthorityFee
+            _revokeMintingFee,
+            _revokePausingFee,
+            _taxableFee,
+            _creatorInfoFee
         );
     }
 }

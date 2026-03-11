@@ -7,7 +7,10 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC20Pausable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import {Types} from "./Types.sol";
+<<<<<<< HEAD
 import {TokenConfig} from "./TokenConfig.sol";
+=======
+>>>>>>> 0cb44f4 (Update project)
 
 error TaxRateExceeded();
 error MintingDisabled();
@@ -15,7 +18,10 @@ error PausingDisabled();
 error InvalidAddress();
 
 contract OurToken is ERC20, Ownable, ERC20Pausable {
+<<<<<<< HEAD
     using SafeERC20 for IERC20;
+=======
+>>>>>>> 0cb44f4 (Update project)
     // Metadata
     event TaxCollected(
         address indexed from,
@@ -51,7 +57,18 @@ contract OurToken is ERC20, Ownable, ERC20Pausable {
     address public constant FEE_RECIPIENT = TokenConfig.FEE_RECIPIENT;
     IERC20 public constant USDT = IERC20(TokenConfig.USDT_ADDRESS);
 
+    uint8 public tokenDecimals;
+    uint256 public taxRate;
+    address public taxRecipient;
+    bool public revokeMinting;
+    bool public revokePausing;
+    bool public taxEnabled;
+
+    Types.MetadataParams public metadata;
+    bool public hasCreatorInfo;
+
     constructor(
+<<<<<<< HEAD
         Types.TokenParams memory _params,
         address deployer
     ) ERC20(_params.name, _params.symbol) Ownable(deployer) ERC20Pausable() {
@@ -68,6 +85,16 @@ contract OurToken is ERC20, Ownable, ERC20Pausable {
         USDT.safeTransferFrom(deployer, FEE_RECIPIENT, fee);
         if (_params.initialSupply > 0) {
             _mint(deployer, _params.initialSupply);
+=======
+        Types.TokenParams memory _params
+    )
+        ERC20(_params.name, _params.symbol)
+        Ownable(_params.owner)
+        ERC20Pausable()
+    {
+        if (_params.initialSupply > 0) {
+            _mint(_params.owner, _params.initialSupply);
+>>>>>>> 0cb44f4 (Update project)
         }
 
         tokenDecimals = _params.tokenDecimals;
@@ -85,6 +112,10 @@ contract OurToken is ERC20, Ownable, ERC20Pausable {
                 ? _params.metadata.creatorWebsite
                 : "ARMCP.net"
         });
+<<<<<<< HEAD
+=======
+        // No separate hasCreatorInfo assignment needed
+>>>>>>> 0cb44f4 (Update project)
 
         if (_params.taxEnabled) {
             if (_params.taxRate >= 10000 || _params.taxRate <= 0)
@@ -94,12 +125,16 @@ contract OurToken is ERC20, Ownable, ERC20Pausable {
             taxRate = _params.taxRate;
             taxRecipient = _params.taxRecipient;
         }
+<<<<<<< HEAD
         emit TokenCreated(
             deployer,
             address(this),
             _params.name,
             _params.symbol
         );
+=======
+        // if (revokeMinting && revokePausing) renounceOwnership();
+>>>>>>> 0cb44f4 (Update project)
     }
 
     function decimals() public view override returns (uint8) {
@@ -155,6 +190,7 @@ contract OurToken is ERC20, Ownable, ERC20Pausable {
         super._update(from, to, value);
     }
 
+<<<<<<< HEAD
     function calculateFee(
         bool _revokeMinting,
         bool _revokePausing,
@@ -170,5 +206,14 @@ contract OurToken is ERC20, Ownable, ERC20Pausable {
 
     function getMetadata() external view returns (Types.MetadataParams memory) {
         return metadata;
+=======
+    function getMetadata() external view returns (Types.MetadataParams memory) {
+        return metadata;
+    }
+
+    function setTaxRecipientAddress(address newRecipient) public onlyOwner {
+        if (newRecipient == address(0)) revert InvalidAddress();
+        taxRecipient = newRecipient;
+>>>>>>> 0cb44f4 (Update project)
     }
 }

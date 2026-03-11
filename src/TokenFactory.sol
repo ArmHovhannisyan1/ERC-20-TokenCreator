@@ -6,15 +6,19 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {FeeSystems} from "./FeeSystems.sol";
 import {OurToken} from "./OurToken.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Types} from "./Types.sol";
+
+error InvalidAddress();
 
 contract TokenFactory is Ownable {
     IERC20 public immutable USDT;
     using SafeERC20 for IERC20;
     FeeSystems public feeSystems;
-    address public treasury;
-
     address[] public allTokens;
     mapping(address => address[]) public tokenByCreator;
+    mapping(bytes32 => bool) public symbolExists; // ensure tokens won't be duplicated
+
+    address public treasury;
 
     event TokenCreated(address indexed token, address indexed sender);
 
@@ -24,65 +28,37 @@ contract TokenFactory is Ownable {
         address _treasury,
         address owner
     ) Ownable(owner) {
-        require(address(_usdt) != address(0), "Invalid USDT address");
-        require(address(_feeSystems) != address(0));
-        require(_treasury != address(0));
+        if (
+            address(_usdt) == address(0) ||
+            address(_treasury) == address(0) ||
+            address(_feeSystems) == address(0)
+        ) {
+            revert InvalidAddress();
+        }
         treasury = _treasury;
         USDT = _usdt;
         feeSystems = _feeSystems;
     }
 
     function createToken(
-        string memory name,
-        string memory symbol,
-        uint256 initialSupply,
-        uint8 decimals,
-        bool taxEnabled,
-        uint256 taxRate,
-        address taxRecipient,
-        bool mintable,
-        bool pausable,
-        bool revokeAllAuthorities,
-        string memory _description,
-        string memory _website,
-        string memory _social1,
-        string memory _social2,
-        string memory _social3,
-        string[] memory _tags,
-        string memory _creatorName,
-        string memory _creatorWebsite,
-        string memory _bannerUrl
+        Types.TokenParams memory _params
     ) external returns (address) {
+        // Token duplication check
+        bytes32 key = keccak256(abi.encodePacked(_params.symbol));
+        require(!symbolExists[key], "Symbol taken");
+        symbolExists[key] = true;
+
+        _params.owner = msg.sender;
         uint256 fee = feeSystems.calculateFee(
-            mintable,
-            pausable,
-            taxEnabled,
-            revokeAllAuthorities
+            _params.revokeMinting,
+            _params.revokePausing,
+            _params.taxEnabled,
+            _params.metadata.hasCreatorInfo
+            // _params.revokeAllAuthorities
         );
         USDT.safeTransferFrom(msg.sender, treasury, fee);
 
-        OurToken newToken = new OurToken(
-            name,
-            symbol,
-            initialSupply,
-            decimals,
-            msg.sender,
-            taxEnabled,
-            taxRate,
-            taxRecipient,
-            mintable,
-            pausable,
-            revokeAllAuthorities,
-            _description,
-            _website,
-            _social1,
-            _social2,
-            _social3,
-            _tags,
-            _creatorName,
-            _creatorWebsite,
-            _bannerUrl
-        );
+        OurToken newToken = new OurToken(_params);
 
         emit TokenCreated(address(newToken), msg.sender);
         allTokens.push(address(newToken));
@@ -105,11 +81,12 @@ contract TokenFactory is Ownable {
     }
 
     function setTreasury(address _treasury) external onlyOwner {
-        require(_treasury != address(0));
+        if (_treasury == address(0)) revert InvalidAddress();
         treasury = _treasury;
     }
 
     function setFeeSystems(FeeSystems _feeSystems) external onlyOwner {
+        if (address(_feeSystems) == address(0)) revert InvalidAddress();
         feeSystems = _feeSystems;
     }
 }
